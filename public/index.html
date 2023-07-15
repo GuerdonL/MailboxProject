@@ -1,98 +1,138 @@
 <!DOCTYPE html>
 <html>
+	<head>
+		<title>General Mailing Nearby</title>
+	    <meta charset="utf-8">
+		<link rel="stylesheet" href="style.css">
+	    <style>
+	    </style>
+	  </head>
 
-  <head>
-    <title>:)</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
-    <style>
-      #map {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
-  </head>
+	  <body>
+		<div id="root">
+			<section id="title_block">
+				<img id="title_icon" src="images/mailbox_icon.svg" alt="Mailbox Icon" loading="lazy">
+				<div id="title_text_div">
+					<div id="title_div">
+						<h1 id="title">
+							<span id="title_text_span">The Mailbox Project</span>
+							<br>
+						</h1>
+					</div>
+					<div id="subtitle_div">
+						<p id="subtitle">
+							<span id="subtitle_span">Accessible care, no matter where.</span>
+							<br>
+						</p>
+					</div>
+				</div>
+			</section>
 
-  <body>
-    <div id="map"></div>
-    <script src="app.js"></script>
+			<section id="about_block">
+				<div id="about_title_div">
+					<div id="circle_container">
+						<h2 id="about_title">What We Do</h2>
+					</div>
+				</div>
+				<div id="about_spacer"></div>
+				<div id="about_text_div">
+					<p>An abortion can be life-saving healthcare for those in unstable, unsafe, and/or abusive living situations.</p><p>However, taking the time off of work to access a procedure in-person isn't feasible for many, and having pills for a medicated abortion delivered directly to a home address can be dangerous if someone is living in an unsupportive environment.</p><p>That's why General Mailing Addresses (GMAs) can be incredibly helpful resources to ensure that those in need can access medication. GMAs are temporary mailing addresses where recipients can pick up their mail with proper verification for up to 30 days after delivery. </p><p>The Mailbox Project was designed to help those in unsafe situations access the reproductive care they need by inputting their address and finding the nearest GMAs. No matter who you are, or where you live, we want to ensure that you maintain the right to choose what happens to your body.</p>
+				</div>
+			</section>
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcU7vPIAONsO5GZnOnip7SOI4ElZcGKcE&callback=initMap">
-    </script>
+			<section id="map_block">
+				<div id="map_container">
+					<div id="map"></div>
+				</div>
 
-    <!--<script>
-      var geocoder;
-      var map;
-      function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4.61,
-          center: {lat: 38.2284531, lng: -95.166094}
-        });
-        // make a marker at {lat: 38.2284531, lng: -95.166094}
-        fetch("file.json")
-          .then(Response => Response.json())
-          .then(resp => {
-            console.log(resp);
-            for (var po of resp) {
-              try {
-                var marker = new google.maps.Marker({
-                  position: {lat: po[3][0], lng: po[3][1]},
-                  map: map
-                });
-              } catch (e) {
-                console.log(e);
-              }
-            }
-        });
+				<div id="map_text_div">
+					<h2 id="map_title">General Mailing Adress Tool</h2>
+					<p id="map_subtitle">Simply type in your address to locate the GMA nearest to you!</p>
+					<br>
+					<p class="map_text" id="map_example_explainer">How to format a GMA for medication delivery:</p>
+					<p class="map_example_address">NAME</p>
+					<p class="map_example_address">GENERAL DELIVERY</p>
+					<p class="map_example_address">CITY STATE ZIP</p>
+					<p class="map_text" id="map_more_info">More information <a class="link_on_gradient" href="https://faq.usps.com/s/article/What-is-General-Delivery#:~:text=000006989-,General%20Delivery%20is%20a%20mail%20service%20for%20those%20without%20a,without%20city%20carrier%20delivery%20service.">here</a>.</p>
+				</div>
+			</section>
 
-      }
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcU7vPIAONsO5GZnOnip7SOI4ElZcGKcE&callback=initMap">
-    </script>
-    <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-    
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-      const firebaseConfig = {
-        apiKey: "AIzaSyCIBc-ULdO-bwAkhwQ21JZ2n1j94YC1jMQ",
-        authDomain: "mailbox-60855.firebaseapp.com",
-        projectId: "mailbox-60855",
-        storageBucket: "mailbox-60855.appspot.com",
-        messagingSenderId: "744804758620",
-        appId: "1:744804758620:web:8facb319405cb891146299",
-        measurementId: "G-ELJLTB28HY"
-      };
-    
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-    </script>-->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
-      const firebaseConfig = {
-      //TODO: hide api key?
-        apiKey: "AIzaSyCIBc-ULdO-bwAkhwQ21JZ2n1j94YC1jMQ",
-        authDomain: "mailbox-60855.firebaseapp.com",
-        projectId: "mailbox-60855",
-        storageBucket: "mailbox-60855.appspot.com",
-        messagingSenderId: "744804758620",
-        appId: "1:744804758620:web:8facb319405cb891146299",
-        measurementId: "G-ELJLTB28HY"
-      };
-      const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-    </script>
-  </body>
-</html>
+			<section id="resources_block">
+				<div id="resources_title_div">
+						<h2 id="resources_title">Additional Resources</h2>
+						<p id="resources_subtitle">If a medication abortion isn't for you, or you need help affording it, these resources may help.</p>
+				</div>
+				<div id="resources_grid">
+					<a href="https://lgbtqhealthcaredirectory.org/directory?query=&geo=&_zip=&page=1&distance=&ref_specialty=Abortion">
+						<div class="resource_item">The LGBTQ+ Healthcare Directory helps find LGBTQ-friendly providers who will perform abortions across the nation (National)</div>
+					</a>
+					<a href="https://www.justthepill.com/about-us/">
+					<div class="resource_item">Just the Pill mails abortion pills to people in CO, MN, MT, and WY for $350 and can provide interpretation services if necessary for its online appointments.</div>
+					</a>
+					<a href="https://abortionfunds.org/need-abortion/">
+					<div class="resource_item">The National Network of Abortion Funds compiles lists of funds in each state and provides step-by-step instructions on how to obtain an abortion using a fund.</div>
+					</a>
+					<a href="https://nwaafund.org/">
+					<div class="resource_item">The Northwest Abortion Access Fund helps people seeking abortions in WA, OR, ID, and AL by assisting them with financial needs, transportation, and more.</div>
+					</a>
+					<a href="https://www.iwrising.org/">
+					<div class="resource_item">Indigenous Women Rising works to help Indigenous people access equitable healthcare through health education and resources, including through an abortion fund.</div>
+					</a>
+					<a href="https://www.hollerhealthjustice.org/">
+					<div class="resource_item">Holler Health Justice helps people across Appalachia access abortions by providing financial and travel support.</div>
+					</a>
+					<a href="https://www.chicagoabortionfund.org/how-we-can-help">
+					<div class="resource_item">The Chicago Abortion Fund supports IL residents and those across the Midwest and South who are seeking abortions in IL or their own states. They assist with financial needs, transportation, and more.</div>
+					</a>
+					<a href="https://www.plannedparenthood.org/planned-parenthood-northern-new-england/for-patients/special-programs">
+					<div class="resource_item">The Laura Fund at Planned Parenthood of Northern New England helps patients seeking abortions in NH, VT, and ME pay for care at a clinic or outside office if necessary. </div>
+					</a>
+					<a href="https://brigidalliance.org/">
+					<div class="resource_item">The Brigid Alliance is a nationwide fund helping those in need of abortions pay for travel costs and childcare.</div>
+					</a>
+					<a href="https://www.reprolegalhelpline.org/sma-contact-the-helpline/">
+					<div class="resource_item">The Repro Legal Helpline by If/When/How helps those seeking an abortion understand their states' laws and determine the best legal route to accessing care. </div>
+					</a>
+					<a href="https://janesdueprocess.org/">
+					<div class="resource_item">Jane's Due Process helps teens in Texas access abortions without parental consent by assisting them with the process to secure a judicial bypass.</div>
+					</a>
+					<a href="http://transcaresite.org/">
+					<div class="resource_item">The Trans Care Site has a directory of trans-friendly healthcare services available, and users can search specifically for surgeries, hormone therapy, gynecological services, and more (National)</div>
+					</a>
+					<a href="https://www.louisianaabortionfund.org/get-help">
+					<div class="resource_item">The Louisiana Abortion Fund helps those in LA or in other parts of the Gulf South access and afford abortions by helping to cover healthcare costs at their partner clinics and providing information through their helpline.</div>
+					</a>
+					<a href="https://prochoice.org/patients/naf-hotline/">
+					<div class="resource_item">The National Abortion Hotline is a multi-lingual toll-free hotline accessible across the country, which provides callers with confidential consultations and accurate information on how to access an abortion.</div>
+					</a>
+					<a href="https://arc-southeast.org/">
+					<div class="resource_item">Access Reproductive Care Southeast helps provide funding and logistical support to those seeking abortions to Southerners in AL, FL, GA, MS, SC, and TN.</div>
+					</a>
+					<a href="https://wrrap.org/about/">
+					<div class="resource_item">The Women's Reproductive Rights Assistance Project  is a national nonprofit abortion fund, providing financial assistance to individuals seeking abortion services or emergency contraception.</div>
+					</a>
+					<a href="https://abortionfreedomfund.org/">
+					<div class="resource_item">The Abortion Freedom Fund supports affordable telehealth based abortion care for all. They provide financial assistance up to $150 to individuals seeking abortion care through telehealth providers.</div>
+					</a>
+					<a href="https://www.wholewomanshealthalliance.org/wayfinder/">
+					<div class="resource_item">The Whole Women's Health Alliance's Stigma Relief Fund operates the Wayfinder Hotline and provides financial assistance to help those in need access abortion care at a Whole Women's Health Clinic in MD, MN, and VA/DC or virtually for those in NM.</div>
+					</a>
+					<a href="https://dcabortionfund.org/get-help/">
+					<div class="resource_item">The DC Abortion Fund provides financial assistance through their helpline to DC, MD, and VA residents or those traveling to the DMV area to access an abortion.</div>
+					</a>
+					<a href="https://www.midwestaccesscoalition.org/">
+					<div class="resource_item">The Midwest Access Coalition helps those traveling to, from, or within the Midwest to access safe and legal abortion services through abortion funds, paying for transportation and childcare, and more.</div>
+					</a>
+					<a href="https://cobaltaf.org/patient/">
+					<div class="resource_item">The Cobalt Fund provides financial assistance and transportation help so those in need can access an abortion at one of their partner clinics in CO, NV, NM, or UT.</div>
+					</a>
+				</div>
+			</section>
+		</div>
+	    	
+
+	    <script src="app.js"></script>
+	    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcU7vPIAONsO5GZnOnip7SOI4ElZcGKcE&callback=initMap"></script>
+	    <script type="module" src="firebase.js"></script>
+	  </body>
+	</html>

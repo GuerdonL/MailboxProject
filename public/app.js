@@ -87,7 +87,7 @@ function initMap() {
     map.data.setStyle((feature) => {
         return {
           icon: {
-            url: `mail_icon.svg`,
+            url: `images/mail_icon.svg`,
             scaledSize: new google.maps.Size(32, 32),
           },
         };
@@ -103,7 +103,7 @@ function initMap() {
       const address = event.feature.getProperty('address');
       const position = event.feature.getGeometry().get();
       const content = `
-      <img style="float:left; width:80px; margin-top:30px" src="mail_icon.svg">
+      <img style="float:left; width:80px; margin-top:30px" src="images/mail_icon.svg">
       <div style="margin-left:100px; margin-bottom:20px; margin-top: 20px">
         <h2>${name}</h2>
         <br/>

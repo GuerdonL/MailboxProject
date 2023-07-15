@@ -1,0 +1,223 @@
+html, body, #root {
+    height: auto;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+#title_block{
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+
+    background-image: url("images/soft_gradient.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#title_icon{
+    width: 20%;
+    padding-left: 20%
+}
+#title_text_div{
+    color:#6662B6;
+    padding: 10%;
+    display: flex;
+    flex-direction: column;
+}
+#title_div{
+}
+#title{
+    text-transform:uppercase;
+    text-emphasis: bold;
+    font-size: 5rem;
+}
+#title_span{
+    font-weight:700;
+}
+#subtitle_div{
+}
+#subtitle{
+    font-size: x-large;
+}
+#subtitle_span{
+}
+
+
+#about_block{
+    justify-content: center;
+    display: flex;
+    flex-direction: row-reverse;
+
+    background-color: #ffffff;
+    margin: 7%;
+}
+#about_title_div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #6662B6;
+}
+#circle_container{
+    background-image: url("images/soft_gradient.jpg");
+    border-radius: 50%;
+    height: 30rem;
+    width: 30rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#about_title{
+    text-transform:uppercase;
+    text-emphasis: bold;
+    font-size: 5rem;
+    margin: 10%;
+    text-emphasis: bold;
+}
+#about_spacer{
+    width: 10%;
+    height: 0;
+}
+#about_text_div{
+    display: flex;
+    flex-direction: column;
+    font-size: 2rem;
+}
+#about_text_div > p{
+    margin: 0;
+    padding: 2%;
+    color: rgb(65, 65, 65);
+}
+@media screen and (max-width: 1200px) {
+    #about_block{
+        flex-direction: column;
+    }
+    #about_title_div{
+        flex-direction: row;
+    }
+    #circle_container{
+        height: auto;
+        width: 100%;
+        border-radius: 0;
+        background-image: none;
+        text-align: left;
+    }
+    #about_title{
+        margin: 0;
+    }
+}
+
+#map_block{
+    justify-content: center;
+    display: flex;
+    flex-direction: row-reverse;
+    padding-left: 7%;
+    height: 80vh;
+
+    background-image: url("images/soft_gradient.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#map_container, #map_text_div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#map {
+    height: 60vh;
+    width: 60vw;
+}
+#map_text_div{
+    margin-right: 5%;
+    font-size: 1.25rem;
+}
+.map_text, .map_example_address{
+    padding: 0;
+}
+#map_text_div > p{
+    color: rgb(65, 65, 65);
+    margin: 0;
+    padding: 2%;
+}
+#map_title{
+    text-transform:uppercase;
+    text-emphasis: bold;
+    font-size: 2.5rem;
+    text-emphasis: bold;
+    color: #6662B6;
+    padding-bottom: 5%;
+}
+.link_on_gradient{
+    color: #6662B6;
+    text-decoration: underline #6662B6;
+    font-weight: bold;
+}
+@media screen and (max-width: 1200px) {
+    #map_block{
+        flex-direction: column-reverse;
+        height: auto;
+        padding: 7%;
+    }
+    #map{
+        width: 100%;
+        height: 100vh;
+        margin-top: 3%;
+    }
+    #map_text_div > p{
+        color: rgb(65, 65, 65);
+        margin: 0;
+        padding: 0;
+    }
+}
+
+
+#resources_block{
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    padding: 7%;
+
+    background-image: url("images/soft_gradient.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+#resources_title{
+    color: #6662B6;
+}
+#resources_grid{
+    padding-top: 2%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto;
+    grid-gap: 2%;
+}
+.resource_item{
+    color: rgb(65, 65, 65);
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    height: 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2%;
+}
+.resource_item:hover{
+    background-color: #6662B6;
+    color: #ffffff;
+    transform: scale(1.05);
+    animation-duration: .2s;
+}
+@media screen and (max-width: 1380px) {
+    #resources_grid{
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media screen and (max-width: 960px) {
+    #resources_grid{
+        grid-template-columns: 1fr;
+        grid-gap: .5%;
+    }
+}
