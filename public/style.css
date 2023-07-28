@@ -1,4 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
 html, body, #root {
+    font-family: 'Nunito', sans-serif;
     height: auto;
     width: 100%;
     margin: 0;
@@ -15,8 +18,10 @@ html, body, #root {
     background-size: cover;
 }
 #title_icon{
-    width: 20%;
-    padding-left: 20%
+    margin: 5%;
+    width: 80%;
+    object-fit: cover;
+    overflow:visible;
 }
 #title_text_div{
     color:#6662B6;
@@ -24,24 +29,19 @@ html, body, #root {
     display: flex;
     flex-direction: column;
 }
-#title_div{
-}
 #title{
     text-transform:uppercase;
     text-emphasis: bold;
     font-size: 5rem;
+    font-family: 'Kanit', sans-serif;
 }
 #title_span{
     font-weight:700;
 }
-#subtitle_div{
-}
 #subtitle{
     font-size: x-large;
+    font-family: 'Kanit', sans-serif;
 }
-#subtitle_span{
-}
-
 
 #about_block{
     justify-content: center;
@@ -73,6 +73,7 @@ html, body, #root {
     font-size: 5rem;
     margin: 10%;
     text-emphasis: bold;
+    font-family: 'Kanit', sans-serif;
 }
 #about_spacer{
     width: 10%;
@@ -147,6 +148,7 @@ html, body, #root {
     text-emphasis: bold;
     color: #6662B6;
     padding-bottom: 5%;
+    font-family: 'Kanit', sans-serif;
 }
 .link_on_gradient{
     color: #6662B6;
@@ -185,6 +187,7 @@ html, body, #root {
 }
 #resources_title{
     color: #6662B6;
+    font-family: 'Kanit', sans-serif;
 }
 #resources_grid{
     padding-top: 2%;
