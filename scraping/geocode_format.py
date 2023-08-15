@@ -4,7 +4,7 @@ from geopy.geocoders import Nominatim
 geolocator = Nominatim(user_agent="myGeocoder")
  
 # open file2.csv, a file with store data pulled from the url list in file.csv
-with open("/home/me/mp_test/scraping/file2.csv", 'r') as f:
+with open("/home/guerdon/MailboxProject/scraping/file2.csv", 'r') as f:
     reader = csv.reader(f)
     header = next(reader)
     
@@ -15,7 +15,7 @@ with open("/home/me/mp_test/scraping/file2.csv", 'r') as f:
     for j,row in enumerate(data):
         for i,elem in enumerate(row):
             row[i] = elem.replace('\n', ' ').replace("\u2122", ' ').replace("\u2014", ' ').replace(" STATE "," ").replace(" HIGHWAY ", " ").replace(" N "," ").replace(" S "," ").replace(" E "," ").replace(" W "," ").replace("    ", ' ').replace("   ", ' ').replace("  ", ' ').strip()
-    
+    error_count = 0    
     #iterate through and geocode each row, geocoding the address, and replacing the address with the geocoded address, and appending the lat/long to the end of the store object
     for j,row in enumerate(data):
         try:
@@ -28,6 +28,7 @@ with open("/home/me/mp_test/scraping/file2.csv", 'r') as f:
             # print the progress
             print(str(j) + " of " + str(len(data)) + " geocoded")
         except:
+            error_count+=1
             try:
                 print("errored: " + row[2])
                 del data[j]
@@ -45,6 +46,7 @@ with open("/home/me/mp_test/scraping/file2.csv", 'r') as f:
     # finally we place the data into a dictionary of the form: {"type": "FeatureCollection","features": [STORE1,STORE2,STORE3,...]}
     data = {"type": "FeatureCollection","features": data}
 
-with open('/home/me/mp_test/scraping/file.json', 'w') as f:
+with open('/home/guerdon/MailboxProject/scraping/file.json', 'w') as f:
     json.dump(data, f)
     print("done")
+    print(error_count)

@@ -2,8 +2,8 @@ from selenium import webdriver
 import bs4, csv
 
 browser = webdriver.Chrome()
-with open('file.csv', 'r') as f:
-    with open('file2.csv', 'w') as f2:
+with open('urls.csv', 'r') as f:
+    with open('scraped_info.csv', 'w') as f2:
         fieldnames = ['placename', 'url', 'address']
         writer = csv.DictWriter(f2, fieldnames=fieldnames)
         writer.writeheader()
