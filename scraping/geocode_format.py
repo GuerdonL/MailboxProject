@@ -4,7 +4,7 @@ from geopy.geocoders import Nominatim
 geolocator = Nominatim(user_agent="myGeocoder")
  
 # open file2.csv, a file with store data pulled from the url list in file.csv
-with open("/home/guerdon/MailboxProject/scraping/file2.csv", 'r') as f:
+with open("/home/pollywog/MailboxProject/scraping/scraped_info.csv", 'r') as f:
     reader = csv.reader(f)
     header = next(reader)
     
@@ -18,7 +18,7 @@ with open("/home/guerdon/MailboxProject/scraping/file2.csv", 'r') as f:
     error_count = 0    
     #iterate through and geocode each row, geocoding the address, and replacing the address with the geocoded address, and appending the lat/long to the end of the store object
     for j,row in enumerate(data):
-        try:
+        # try:
             # geocode the address
             location = geolocator.geocode(row[2])
             # replace the address with the geocoded address
@@ -27,15 +27,15 @@ with open("/home/guerdon/MailboxProject/scraping/file2.csv", 'r') as f:
             row.append((location.latitude, location.longitude))
             # print the progress
             print(str(j) + " of " + str(len(data)) + " geocoded")
-        except:
-            error_count+=1
-            try:
-                print("errored: " + row[2])
-                del data[j]
-            except:
-                del data[j]
-                print("double error")
-                continue
+        # except:
+        #     error_count+=1
+        #     try:
+        #         print("errored: " + row[2])
+        #         del data[j]
+        #     except:
+        #         del data[j]
+        #         print("double error")
+        #         continue
     # we will format the data into a list of dictionaries, where each dictionary is a store object of the form: {"geometry": {"type": "Point", "coordinates": [LAT,LONG]},"type": "Feature","properties": {"name": NAME,"url": URL,"address": ADDRESS}}
     # iterate through the data and create a dictionary for each store object
     for j,row in enumerate(data):
