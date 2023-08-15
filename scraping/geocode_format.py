@@ -19,7 +19,6 @@ with open("scraping/scraped_info.csv", 'r') as f:
             row[i] = elem.replace('\n', ' ').replace("\u2122", ' ').replace("\u2014", ' ').replace(" STATE "," ").replace(" HIGHWAY ", " ").replace(" N "," ").replace(" S "," ").replace(" E "," ").replace(" W "," ").replace("    ", ' ').replace("   ", ' ').replace("  ", ' ').strip()
     error_count = 0    
     #iterate through and geocode each row, geocoding the address, and replacing the address with the geocoded address, and appending the lat/long to the end of the store object
-<<<<<<< HEAD
     with requests.Session() as session:
         for j,row in enumerate(data):
             try:
@@ -49,27 +48,6 @@ with open("scraping/scraped_info.csv", 'r') as f:
                     del data[j]
                     print("double error")
                     continue
-=======
-    for j,row in enumerate(data):
-        try:
-            # geocode the address
-            location = geolocator.geocode(row[2])
-            # replace the address with the geocoded address
-            row[2] = location.address
-            # append the lat/long to the end of the store object
-            row.append((location.latitude, location.longitude))
-            # print the progress
-            print(str(j) + " of " + str(len(data)) + " geocoded")
-        except:
-            error_count+=1
-            try:
-                print("errored: " + row[2])
-                del data[j]
-            except:
-                del data[j]
-                print("double error")
-                continue
->>>>>>> 2cebc8c99acfd0a666a5689bbdae74b64b3c6aeb
     # we will format the data into a list of dictionaries, where each dictionary is a store object of the form: {"geometry": {"type": "Point", "coordinates": [LAT,LONG]},"type": "Feature","properties": {"name": NAME,"url": URL,"address": ADDRESS}}
     # iterate through the data and create a dictionary for each store object
     for j,row in enumerate(data):
