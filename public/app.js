@@ -120,4 +120,32 @@ function initMap() {
       infoWindow.setOptions({pixelOffset: new google.maps.Size(0, -30)});
       infoWindow.open(map);
     });
+
+    const card = document.createElement('div');
+    const titleBar = document.createElement('div');
+    const title = document.createElement('div');
+    const container = document.createElement('div');
+    const input = document.createElement('input');
+    const options = {
+        types: ['address'],
+        componentRestrictions: {country: 'us'},
+    };
+
+    card.setAttribute('id', 'pac-card');
+    title.setAttribute('id','pac_title');
+    title.textContent = 'Search for Nearby GMAs:';
+    titleBar.appendChild(title);
+    container.setAttribute('id', 'pac-container');
+    input.setAttribute('id', 'pac-input');
+    input.setAttribute('type', 'text');
+    input.setAttribute('placeholder','Enter an address here...');
+    container.appendChild(input);
+    card.appendChild(titleBar);
+    card.appendChild(container);
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(card);
+
+    const autocomplete = new google.maps.places.Autocomplete(input,options);
+    autocomplete.setFields(
+      ['address_components', 'geometry', 'name']
+    );
 }
