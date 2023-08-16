@@ -148,4 +148,136 @@ function initMap() {
     autocomplete.setFields(
       ['address_components', 'geometry', 'name']
     );
+
+    // Set the origin point when the user selects an address
+  const originMarker = new google.maps.Marker({map: map});
+  originMarker.setVisible(false);
+  let originLocation = map.getCenter();
+
+  autocomplete.addListener('place_changed', async () => {
+    originMarker.setVisible(false);
+    originLocation = map.getCenter();
+    const place = autocomplete.getPlace();
+
+    if (!place.geometry) {
+      // User entered the name of a Place that was not suggested and
+      // pressed the Enter key, or the Place Details request failed.
+      window.alert('No address available for input: \'' + place.name + '\'');
+      return;
+    }
+
+    // Recenter the map to the selected address
+    originLocation = place.geometry.location;
+    map.setCenter(originLocation);
+    map.setZoom(9);
+    console.log(place);
+
+    originMarker.setPosition(originLocation);
+    originMarker.setVisible(true);
+
+    // Use the selected address as the origin to calculate distances
+    // to each of the store locations
+    const rankedStores = await calculateDistances(map.data, originLocation);
+    showStoresList(map.data, rankedStores);
+
+    return;
+  });
+}
+async function calculateDistances(data, origin) {
+  const stores = [];
+  const destinations = [];
+
+  // Build parallel arrays for the store IDs and destinations
+  data.forEach((store) => {
+    const storeNum = store.getProperty('store_id');
+    const storeLoc = store.getGeometry().get();
+
+    stores.push(storeNum);
+    destinations.push(storeLoc);
+  });
+
+  // Retrieve the distances of each store from the origin
+  // The returned list will be in the same order as the destinations list
+  const service = new google.maps.DistanceMatrixService();
+  const getDistanceMatrix =
+    (service, parameters) => new Promise((resolve, reject) => {
+      service.getDistanceMatrix(parameters, (response, status) => {
+        if (status != google.maps.DistanceMatrixStatus.OK) {
+          reject(response);
+        } else {
+          const distances = [];
+          const results = response.rows[0].elements;
+          for (let j = 0; j < results.length; j++) {
+            const element = results[j];
+            const distanceText = element.distance.text;
+            const distanceVal = element.distance.value;
+            const distanceObject = {
+              storeid: stores[j],
+              distanceText: distanceText,
+              distanceVal: distanceVal,
+            };
+            distances.push(distanceObject);
+          }
+
+          resolve(distances);
+        }
+      });
+    });
+
+  const distancesList = await getDistanceMatrix(service, {
+    origins: [origin],
+    destinations: destinations,
+    travelMode: 'DRIVING',
+    unitSystem: google.maps.UnitSystem.METRIC,
+  });
+
+  distancesList.sort((first, second) => {
+    return first.distanceVal - second.distanceVal;
+  });
+
+  return distancesList;
+}
+function showStoresList(data, stores) {
+  if (stores.length == 0) {
+    console.log('empty stores');
+    return;
+  }
+
+  let panel = document.createElement('div');
+  // If the panel already exists, use it. Else, create it and add to the page.
+  if (document.getElementById('panel')) {
+    panel = document.getElementById('panel');
+    // If panel is already open, close it
+    if (panel.classList.contains('open')) {
+      panel.classList.remove('open');
+    }
+  } else {
+    panel.setAttribute('id', 'panel');
+    const body = document.body;
+    body.insertBefore(panel, body.childNodes[0]);
+  }
+
+
+  // Clear the previous details
+  while (panel.lastChild) {
+    panel.removeChild(panel.lastChild);
+  }
+
+  stores.forEach((store) => {
+    // Add store details with text formatting
+    const name = document.createElement('p');
+    name.classList.add('place');
+    const currentStore = data.getFeatureById(store.storeid);
+    name.textContent = currentStore.getProperty('name');
+    panel.appendChild(name);
+    const distanceText = document.createElement('p');
+    distanceText.classList.add('distanceText');
+    distanceText.textContent = store.distanceText;
+    panel.appendChild(distanceText);
+  });
+
+  // Open the panel
+  panel.classList.add('open');
+
+  return;
 }
