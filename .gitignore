@@ -13,3 +13,10 @@ env/
 
 # Local scratch
 public/test.html
+
+# Scraper working files
+scraping/api_capture.json
+scraping/raw_responses.jsonl
+scraping/zips_done.txt
+scraping/scanned_ids.txt
+scraping/offices.csv

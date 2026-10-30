@@ -12,11 +12,9 @@ Live at: https://themailboxproject.org
 - `public/` — a static site (vanilla JS + Google Maps) hosted on Firebase Hosting. It loads
   `public/file.json`, a GeoJSON list of post offices, lets the visitor type an address, and
   ranks the 25 closest locations by driving distance.
-- `scraping/` — the Python pipeline that builds `public/file.json`:
-  1. `find_urls.py` searches the USPS location finder (General Delivery filter on) by ZIP
-     code and writes `ids.csv`.
-  2. `scraping.py` fetches the name and address for each ID into `scraped_info.csv`.
-  3. `geocode_format.py` geocodes the addresses and writes `public/file.json`.
+- `scraping/` — the Python pipeline that builds `public/file.json` by scraping the USPS
+  location finder with a real Chrome (Selenium). See `scraping/README.md`; it has a fast
+  JSON-replay path and a parallel ID-range scanner, both resumable.
 
 ## API keys
 
@@ -40,16 +38,9 @@ secret is written into the repository.
 
 ## Refreshing the location data
 
-```sh
-cd scraping
-python -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt            # needs Chrome + chromedriver for Selenium
-python find_urls.py                        # slow: one USPS search per county ZIP
-python scraping.py                         # resumable; skips already-scraped IDs
-MAPS_API_KEY=your-key python geocode_format.py   # reuses existing coordinates
-```
-
-Commit the updated `public/file.json`; the merge workflow deploys it.
+See `scraping/README.md`. In short: run the scraper on your own machine (USPS blocks
+non-browser clients), then `MAPS_API_KEY=... python geocode_format.py` and commit the
+updated `public/file.json`; the merge workflow deploys it.
 
 ## License
 
