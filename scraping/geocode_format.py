@@ -1,64 +1,115 @@
-import csv,json
-# from geopy.geocoders import Nominatim
+"""Step 3: geocode scraped_info.csv and write the site's GeoJSON.
+
+Reads scraped_info.csv, cleans and de-duplicates rows (by USPS URL), geocodes
+each address, and writes ../public/file.json as a GeoJSON FeatureCollection
+with properties {store_id, name, address, url}.
+
+Coordinates already present in public/file.json are reused, so only new
+locations hit the geocoder.
+
+Geocoders, in order: Google (if MAPS_API_KEY is set in the environment),
+ArcGIS, OpenStreetMap/Nominatim. No key is ever read from this file.
+
+Usage:  MAPS_API_KEY=... python geocode_format.py
+"""
+import csv
+import json
+import os
+import re
+import time
+from pathlib import Path
+
 import geocoder
 import requests
 
-# geolocator = Nominatim(user_agent="myGeocoder")
- 
-# open file2.csv, a file with store data pulled from the url list in file.csv
-with open("scraping/scraped_info.csv", 'r') as f:
-    reader = csv.reader(f)
-    header = next(reader)
-    
-    # create a data object that holds each store object of data as a seperate list in a list of the form [placename, url, address]
-    data = [row for row in reader]
+HERE = Path(__file__).resolve().parent
+IN_FILE = HERE / "scraped_info.csv"
+OUT_FILE = HERE.parent / "public" / "file.json"
+GOOGLE_KEY = os.environ.get("MAPS_API_KEY")
 
-    #iterate through and clean each row
-    for j,row in enumerate(data):
-        for i,elem in enumerate(row):
-            row[i] = elem.replace('\n', ' ').replace("\u2122", ' ').replace("\u2014", ' ').replace(" STATE "," ").replace(" HIGHWAY ", " ").replace(" N "," ").replace(" S "," ").replace(" E "," ").replace(" W "," ").replace("    ", ' ').replace("   ", ' ').replace("  ", ' ').strip()
-    error_count = 0    
-    #iterate through and geocode each row, geocoding the address, and replacing the address with the geocoded address, and appending the lat/long to the end of the store object
-    with requests.Session() as session:
-        for j,row in enumerate(data):
-            try:
-                # geocode the address
-                location = geocoder.google(row[2], session=session, key='AIzaSyDcU7vPIAONsO5GZnOnip7SOI4ElZcGKcE')
-                if location.ok == False:
-                    location = geocoder.bing(row[2], key='Ai0jwspgEjhg-MifHoaOsDxEdEMbEY1qFdwbQaN_b5ZjywZz44cGk2qyFAJEbYeB')
-                if location.ok == False:
-                    location = geocoder.arcgis(row[2])
-                if location.ok == False:
-                    location = geocoder.osm(row[2])
-                if location.ok == False:
-                    raise Exception("Geocoder failed")
-                print(location)
-                # replace the address with the geocoded address
-                # row[2] = location.address
-                # append the lat/long to the end of the store object
-                row.append(location.latlng)
-                # print the progress
-                print(str(j) + " of " + str(len(data)) + " geocoded")
-            except:
-                error_count+=1
-                try:
-                    print("errored: " + row[2])
-                    del data[j]
-                except:
-                    del data[j]
-                    print("double error")
-                    continue
-    # we will format the data into a list of dictionaries, where each dictionary is a store object of the form: {"geometry": {"type": "Point", "coordinates": [LAT,LONG]},"type": "Feature","properties": {"name": NAME,"url": URL,"address": ADDRESS}}
-    # iterate through the data and create a dictionary for each store object
-    for j,row in enumerate(data):
+
+def clean(text):
+    text = text.replace("™", "").replace("—", "-")
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def clean_name(name):
+    return clean(name).replace(" - Post Office", " Post Office")
+
+
+def load_existing_coords():
+    if not OUT_FILE.exists():
+        return {}
+    with OUT_FILE.open() as f:
+        data = json.load(f)
+    return {
+        feat["properties"]["url"].strip(): feat["geometry"]["coordinates"]
+        for feat in data.get("features", [])
+        if feat.get("geometry", {}).get("coordinates")
+    }
+
+
+def geocode(address, session):
+    attempts = []
+    if GOOGLE_KEY:
+        attempts.append(lambda: geocoder.google(address, session=session, key=GOOGLE_KEY))
+    attempts.append(lambda: geocoder.arcgis(address, session=session))
+    attempts.append(lambda: geocoder.osm(address, session=session))
+    for attempt in attempts:
         try:
-            data[j] = {"geometry": {"type": "Point", "coordinates": [row[3][1],row[3][0]]},"type": "Feature","properties": {"name": row[0],"url": row[1],"address": row[2],"store_id": j}}
-        except:
-            print(data[j])
-    # finally we place the data into a dictionary of the form: {"type": "FeatureCollection","features": [STORE1,STORE2,STORE3,...]}
-    data = {"type": "FeatureCollection","features": data}
+            result = attempt()
+            if result.ok and result.latlng:
+                lat, lng = result.latlng
+                return [round(lng, 7), round(lat, 7)]  # GeoJSON is [lng, lat]
+        except Exception as exc:  # network or provider error; try the next one
+            print(f"  geocoder error: {exc}")
+        time.sleep(0.2)
+    return None
 
-with open('scraping/file.json', 'w') as f:
-    json.dump(data, f)
-    print("done")
-    print(error_count)
+
+def main():
+    with IN_FILE.open(newline="") as f:
+        rows = list(csv.DictReader(f))
+
+    seen = set()
+    locations = []
+    for row in rows:
+        url = row["url"].strip()
+        if not url or url in seen:
+            continue
+        seen.add(url)
+        locations.append({
+            "name": clean_name(row["placename"]),
+            "address": clean(row["address"]),
+            "url": url,
+        })
+
+    existing = load_existing_coords()
+    features = []
+    failed = []
+    with requests.Session() as session:
+        for i, loc in enumerate(locations, 1):
+            coords = existing.get(loc["url"]) or geocode(loc["address"], session)
+            if not coords:
+                failed.append(loc)
+                print(f"[{i}/{len(locations)}] FAILED {loc['address']}")
+                continue
+            features.append({
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": coords},
+                "properties": {"store_id": len(features), **loc},
+            })
+            print(f"[{i}/{len(locations)}] {loc['name']}")
+
+    with OUT_FILE.open("w") as f:
+        json.dump({"type": "FeatureCollection", "features": features}, f, indent=1)
+
+    print(f"wrote {len(features)} features to {OUT_FILE}")
+    if failed:
+        print(f"{len(failed)} addresses could not be geocoded:")
+        for loc in failed:
+            print("  ", loc["url"], loc["address"])
+
+
+if __name__ == "__main__":
+    main()

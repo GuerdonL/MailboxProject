@@ -1,86 +1,103 @@
+"""Step 1: collect USPS location IDs for post offices offering General Delivery.
+
+Drives the USPS "Find Locations" tool with the General Delivery filter on,
+searching one ZIP code per county (from geo-data.csv), and records every
+location ID that appears in the results.
+
+Outputs (in this directory):
+  ids.csv          one location ID per line, de-duplicated
+  failed_zips.csv  ZIPs whose search timed out, for re-running
+
+Usage:  python find_urls.py
+"""
+import csv
+from pathlib import Path
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import bs4, csv
+from selenium.webdriver.support.wait import WebDriverWait
 
-form_id = "city-state-input"
-search_id = "searchLocations"
-location_item_class = "list-item-location popover-trigger"
-location_item_xpath_1 = "/html/body/div[2]/div/div[2]/div[3]/div[5]/div[2]/div[1]/div[1]/*"
-location_item_xpath_2 = "/html/body/div[2]/div/div[2]/div[3]/div[5]/div[2]/div[1]/div[2]/*"
-show_filters_xpath = "/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div[4]/div[2]/p/a"
-gen_mail_xpath = "/html/body/div[2]/div/div[2]/div[3]/div[3]/div[2]/div[1]/label[3]"
-url = "https://tools.usps.com/find-location.htm"
-browser = webdriver.Chrome()
+HERE = Path(__file__).resolve().parent
+GEO_DATA = HERE / "geo-data.csv"
+IDS_FILE = HERE / "ids.csv"
+FAILED_FILE = HERE / "failed_zips.csv"
 
-failed_zips = set()
-po_ids = set()
+URL = "https://tools.usps.com/find-location.htm"
+FORM_ID = "city-state-input"
+SEARCH_ID = "searchLocations"
+LOCATION_ITEM_XPATHS = [
+    "/html/body/div[2]/div/div[2]/div[3]/div[5]/div[2]/div[1]/div[1]/*",
+    "/html/body/div[2]/div/div[2]/div[3]/div[5]/div[2]/div[1]/div[2]/*",
+]
+SHOW_FILTERS_XPATH = "/html/body/div[2]/div/div[2]/div[3]/div[2]/div/div[4]/div[2]/p/a"
+GEN_MAIL_XPATH = "/html/body/div[2]/div/div[2]/div[3]/div[3]/div[2]/div[1]/label[3]"
 
-def zip_gen():
-    # starting_zip_code = "00501"
-    # ending_zip_code = "99950"
-    # for zip in range(int(starting_zip_code),int(ending_zip_code)+1):
-    #     yield "0"*(5-len(str(int(zip))))+str(int(zip))
-    with open("/home/guerdon/MailboxProject/scraping/geo-data.csv", 'r') as f:
-        reader = csv.reader(f)
-        header = next(reader)
-        for line in reader:
-            yield line[3]
 
-def handle_search(form,search):
-    result_box_1,result_box_2=[],[]
-    #iterate through potential zip codes from generator
-    for zip in zip_gen():
-        #delete last search, search next zip
-        form.send_keys("\b\b\b\b\b"+zip)
-        #wait for search button to be clickable, then click
-        WebDriverWait(browser,10).until(
-            EC.element_to_be_clickable(search)
-        ).click()
-        #get a list of all results
+def load_existing(path):
+    if not path.exists():
+        return set()
+    with path.open() as f:
+        return {line.strip() for line in f if line.strip()}
+
+
+def save_set(path, values):
+    with path.open("w") as f:
+        f.write("\n".join(sorted(values)) + "\n")
+
+
+def zip_codes():
+    with GEO_DATA.open() as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            yield row["zipcode"].zfill(5)
+
+
+def search_all(browser, po_ids, failed_zips):
+    form = browser.find_element(By.ID, FORM_ID)
+    search = browser.find_element(By.ID, SEARCH_ID)
+    for zip_code in zip_codes():
+        form.clear()
+        form.send_keys(zip_code)
+        WebDriverWait(browser, 10).until(EC.element_to_be_clickable(search)).click()
         try:
-            result_box_1 = WebDriverWait(browser,3).until(
-                EC.presence_of_all_elements_located((By.XPATH,location_item_xpath_1))
-            )
-            result_box_2 = WebDriverWait(browser,3).until(
-                EC.presence_of_all_elements_located((By.XPATH,location_item_xpath_2))
-            )
-            for po in result_box_1:
-                po_ids.add(po.get_property('id'))
-                print(po.get_property('id'))
-            for po in result_box_2:
-                po_ids.add(po.get_property('id'))
-                print(po.get_property('id'))
-        except:
-            print("timeout on zip search")
-            failed_zips.add(zip)
+            for xpath in LOCATION_ITEM_XPATHS:
+                items = WebDriverWait(browser, 3).until(
+                    EC.presence_of_all_elements_located((By.XPATH, xpath))
+                )
+                for item in items:
+                    item_id = item.get_property("id")
+                    if item_id:
+                        po_ids.add(str(item_id))
+        except Exception:
+            print(f"timeout on zip {zip_code}")
+            failed_zips.add(zip_code)
+        else:
+            failed_zips.discard(zip_code)
         finally:
-            with open('/home/guerdon/MailboxProject/scraping/ids.csv', 'w') as f:
-                writer = csv.writer(f)
-                writer.writerows([po_ids])
-            with open('/home/guerdon/MailboxProject/scraping/failed_zips.csv', 'w') as f:
-                writer = csv.writer(f)
-                writer.writerows([failed_zips])
+            save_set(IDS_FILE, po_ids)
+            save_set(FAILED_FILE, failed_zips)
+        print(f"{zip_code}: {len(po_ids)} ids so far")
 
-browser.get(url)
-try:
-    #click to show filter list
-    WebDriverWait(browser, 10).until(
-        EC.presence_of_element_located((By.XPATH, show_filters_xpath))
-    ).click()
-except:
-    print("timed out looking for element")
-else:
-    #grab and toggle the general mailing option once visible 
-    #(this is inconsistent, the previous toggle doesn't always toggle filter visibility, IDK)
-    WebDriverWait(browser,10).until(
-        EC.element_to_be_clickable((By.XPATH, gen_mail_xpath))
-    ).click()
-    #start the zip code stuff!
-    form = browser.find_element(By.ID, form_id)
-    search = browser.find_element(By.ID, search_id)
-    handle_search(form,search)
-finally:
-    browser.quit()
-browser.quit()
+
+def main():
+    po_ids = load_existing(IDS_FILE)
+    failed_zips = load_existing(FAILED_FILE)
+    browser = webdriver.Chrome()
+    try:
+        browser.get(URL)
+        WebDriverWait(browser, 10).until(
+            EC.presence_of_element_located((By.XPATH, SHOW_FILTERS_XPATH))
+        ).click()
+        # Toggle the General Delivery filter. (The filter list doesn't always
+        # expand on the first click; re-run if the toggle is not visible.)
+        WebDriverWait(browser, 10).until(
+            EC.element_to_be_clickable((By.XPATH, GEN_MAIL_XPATH))
+        ).click()
+        search_all(browser, po_ids, failed_zips)
+    finally:
+        browser.quit()
+
+
+if __name__ == "__main__":
+    main()
