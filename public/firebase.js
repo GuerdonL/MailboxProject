@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
 const firebaseConfig = {
-//TODO: hide api key?
+  // Firebase web config is public by design; access is governed by Firebase security rules.
   apiKey: "AIzaSyCIBc-ULdO-bwAkhwQ21JZ2n1j94YC1jMQ",
   authDomain: "mailbox-60855.firebaseapp.com",
   projectId: "mailbox-60855",

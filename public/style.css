@@ -31,11 +31,10 @@ html, body, #root {
 }
 #title{
     text-transform:uppercase;
-    text-emphasis: bold;
     font-size: 5rem;
     font-family: 'Kanit', sans-serif;
 }
-#title_span{
+#title_text_span{
     font-weight:700;
 }
 #subtitle{
@@ -69,10 +68,8 @@ html, body, #root {
 }
 #about_title{
     text-transform:uppercase;
-    text-emphasis: bold;
     font-size: 5rem;
     margin: 10%;
-    text-emphasis: bold;
     font-family: 'Kanit', sans-serif;
 }
 #about_spacer{
@@ -143,9 +140,7 @@ html, body, #root {
 }
 #map_title{
     text-transform:uppercase;
-    text-emphasis: bold;
     font-size: 2.5rem;
-    text-emphasis: bold;
     color: #6662B6;
     padding-bottom: 5%;
     font-family: 'Kanit', sans-serif;
@@ -251,6 +246,8 @@ html, body, #root {
   padding: 0 11px 0 13px;
   text-overflow: ellipsis;
   width: 400px;
+  max-width: calc(100vw - 60px);
+  box-sizing: border-box;
 }
       
 #pac-input:focus {
@@ -270,37 +267,61 @@ html, body, #root {
 }
 
 
-/* Styling for an info pane that slides out from the left. 
- * Hidden by default. */
+/* Results panel rendered as a map control (top left). */
 #panel {
-  height: 100%;
-  width: null;
-  background-color: white;
-  position: fixed;
-  z-index: 1;
-  overflow-x: hidden;
-  transition: all .2s ease-out;
+  display: none;
+  margin: 10px 0 0 10px;
+  max-height: 55vh;
+  width: 300px;
+  max-width: calc(100vw - 20px);
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  font-family: 'Nunito', sans-serif;
 }
-    
-.open {
-  width: 250px;
+#panel.open {
+  display: block;
 }
-    
+.panel_message {
+  margin: 0;
+  padding: 12px 18px;
+  color: rgb(65, 65, 65);
+}
 .place {
-  font-family: 'open sans', arial, sans-serif;
-  font-size: 1.2em;
-  font-weight: 500;
-  margin-block-end: 0px;
-  padding-left: 18px;
-  padding-right: 18px;
+  display: block;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #eee;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  padding: 10px 18px;
+  font: inherit;
 }
-    
+.place:hover, .place:focus {
+  background-color: #f2f0fa;
+}
+.place_name {
+  display: block;
+  font-size: 1.05em;
+  font-weight: 700;
+  color: #6662B6;
+}
 .distanceText {
-  color: silver;
-  font-family: 'open sans', arial, sans-serif;
-  font-size: 1em;
-  font-weight: 400;
-  margin-block-start: 0.25em;
-  padding-left: 18px;
-  padding-right: 18px;
+  display: block;
+  color: #777;
+  font-size: 0.9em;
+}
+.info_window {
+  max-width: 350px;
+  font-family: 'Nunito', sans-serif;
+}
+.info_window h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  color: #6662B6;
+}
+.info_window p {
+  margin: 4px 0;
 }
